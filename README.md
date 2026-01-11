@@ -94,4 +94,4 @@ The platform identifies five distinct user roles:
 ## Contact
 For any inquiries or support regarding the API, please contact:
 - **Name:** API Support
-- **Email:** support@damanease.com
+- **Email:** yahyahajji.engineer@gmail.com
