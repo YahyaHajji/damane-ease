@@ -54,6 +54,38 @@
         }
       }
     },
+    "/admin/logs": {
+      "get": {
+        "summary": "Consult centralized logs (Admin only)",
+        "tags": [
+          "Admin"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "AUTH",
+                "DB",
+                "API"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of system logs"
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "summary": "Register a new user",
@@ -204,6 +236,272 @@
           }
         }
       }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Request a password reset link",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset link sent to email"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "summary": "Reset password using token",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token",
+                  "newPassword"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 6
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully"
+          }
+        }
+      }
+    },
+    "/consultations": {
+      "get": {
+        "summary": "List consultations (Filter by role)",
+        "tags": [
+          "Consultations"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of consultations"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new consultation request",
+        "tags": [
+          "Consultations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "patientId",
+                  "date",
+                  "reason"
+                ],
+                "properties": {
+                  "patientId": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Consultation created"
+          }
+        }
+      }
+    },
+    "/consultations/{id}/status": {
+      "patch": {
+        "summary": "Update consultation status (Transition d'état sécurisée)",
+        "tags": [
+          "Consultations"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "CONFIRMED",
+                      "COMPLETED",
+                      "CANCELLED"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status updated following RBAC rules"
+          }
+        }
+      }
+    },
+    "/ordonnances": {
+      "get": {
+        "summary": "List prescriptions",
+        "tags": [
+          "Ordonnances"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of prescriptions"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a prescription (Doctor only)",
+        "tags": [
+          "Ordonnances"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "consultationId",
+                  "medications"
+                ],
+                "properties": {
+                  "consultationId": {
+                    "type": "string"
+                  },
+                  "medications": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Prescription created"
+          }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "summary": "Get current user profile",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile data retrieved"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update current user profile",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated"
+          }
+        }
+      }
     }
   },
   "tags": [
@@ -214,6 +512,18 @@
     {
       "name": "Auth",
       "description": "Authentication management"
+    },
+    {
+      "name": "Consultations",
+      "description": "Management of medical consultations and state transitions"
+    },
+    {
+      "name": "Ordonnances",
+      "description": "Management of prescriptions"
+    },
+    {
+      "name": "Users",
+      "description": "User profile management"
     }
   ]
 }
