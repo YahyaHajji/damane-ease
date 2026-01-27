@@ -93,5 +93,5 @@ The platform identifies five distinct user roles:
 
 ## Contact
 For any inquiries or support regarding the API, please contact:
-- **Name:** API Support
+- **Name:** Yahya Hajji
 - **Email:** yahyahajji.engineer@gmail.com
